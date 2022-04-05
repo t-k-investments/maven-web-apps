@@ -8,7 +8,7 @@ node{
   stage('2.Test'){
     sh "${mavenHome}/bin/mvn test"
   }
-  stage('3.Build'){
+/*  stage('3.Build'){
     sh "mvn clean package"
   }
   stage('4.Quality'){
@@ -31,7 +31,7 @@ node{
     sh "scp -o StrictHostKeyChecking=no target/*.war ec2-user@172.31.89.218:/opt/tomcat9/webapps/app.war"
 
   }
-  stage('9. EmailAlerts'){
+  */ stage('9. EmailAlerts'){
     emailext body: '''Hi
 
 Build status for boa app.
