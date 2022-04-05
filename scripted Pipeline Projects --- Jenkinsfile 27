@@ -1,0 +1,40 @@
+
+node{
+    def mavenHome = tool name: 'maven3.8.4'
+  stage('1.clone'){
+    sh "echo clonning the latest version of the code"
+    sh "git clone https://github.com/LandmakTechnology/paypal-web-app"
+  }
+  stage('2.Test'){
+    sh "${mavenHome}/bin/mvn test"
+  }
+  stage('3.Build'){
+    sh "mvn clean package"
+  }
+  stage('4.Quality'){
+        sh "mvn sonar:sonar"
+  }
+  stage('5.uploadArtifacts'){
+        sh "mvn deploy"
+  }
+  stage('6.deploy2UAT'){
+        sshagent(['agentcredentials']) {
+        sh "scp -o StrictHostKeyChecking=no target/*.war ec2-user@172.31.89.218:/opt/tomcat9/webapps/app.war"
+
+  }
+  stage('7.RunMoreTests'){
+    sh "echo performance testing in progress"
+    sh "echo test failed"
+  }
+  stage('8.deploy2Produ'){
+    sshagent(['agentcredentials']) {
+    sh "scp -o StrictHostKeyChecking=no target/*.war ec2-user@172.31.89.218:/opt/tomcat9/webapps/app.war"
+
+  }
+  stage('9. EmailAlerts'){
+    emailext body: '''Hi
+
+Build status for boa app.
+
+Regards,
+Landmark Technologies''', recipientProviders: [developers(), requestor()], subject: 'Project status', to: 'boa@gmail.com'
